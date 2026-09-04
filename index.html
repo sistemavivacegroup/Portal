@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f0f0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Vivace · Portal de Cocina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,700..900&family=Inter:wght@400;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{--fondo:#0f0f0f;--tarjeta:#191919;--linea:#2b2b2b;--papel:#f2ede4;--suave:#9a9a92;
+        --ok:#58c281;--stock:#e8b34b;--mise:#58c281;--masa:#7aa7d9;--rojo:#ff5d45}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{background:var(--fondo);color:var(--papel);font-family:'Inter',system-ui,sans-serif;min-height:100vh}
+  .centro{max-width:440px;margin:0 auto;padding:26px 20px}
+  h1{font-family:'Archivo',sans-serif;font-stretch:125%;font-weight:900;font-size:24px;text-transform:uppercase;letter-spacing:.5px}
+  h1 small{display:block;font-family:'Space Mono',monospace;font-size:11px;color:var(--suave);letter-spacing:1.5px;margin-top:4px}
+  /* Login */
+  #login{padding-top:12vh}
+  #login label{display:block;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--suave);margin:20px 0 6px}
+  #login input{width:100%;padding:15px;border-radius:12px;border:1px solid var(--linea);background:var(--tarjeta);color:var(--papel);font-size:17px}
+  #login input:focus{outline:2px solid var(--ok);border-color:transparent}
+  #btn-entrar{width:100%;margin-top:24px;padding:16px;border:none;border-radius:13px;background:var(--ok);color:#0c1410;font-family:'Archivo',sans-serif;font-stretch:125%;font-weight:900;font-size:16px;letter-spacing:1px;text-transform:uppercase}
+  #login-error{color:var(--rojo);font-size:14px;font-weight:600;margin-top:14px;min-height:20px}
+  /* Lanzador */
+  #hub{display:none}
+  .saludo{display:flex;justify-content:space-between;align-items:center;margin:6px 0 22px}
+  .saludo .quien{font-size:14px;color:var(--suave)}
+  .saludo .quien b{color:var(--papel)}
+  .saludo button{background:none;border:1px solid var(--linea);color:var(--suave);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700}
+  .app{display:flex;align-items:center;gap:16px;background:var(--tarjeta);border:1px solid var(--linea);border-left:6px solid var(--linea);border-radius:14px;padding:18px 16px;margin-bottom:12px;text-decoration:none;color:var(--papel)}
+  .app.stock{border-left-color:var(--stock)} .app.mise{border-left-color:var(--mise)} .app.masa{border-left-color:var(--masa)} .app.recep{border-left-color:#c98bd9}
+  .app .icono{font-size:26px;width:44px;text-align:center}
+  .app .t{flex:1}
+  .app .t b{display:block;font-family:'Archivo',sans-serif;font-stretch:125%;font-size:16px;letter-spacing:.3px}
+  .app .t span{font-size:12.5px;color:var(--suave);line-height:1.35;display:block;margin-top:3px}
+  .app .ir{font-size:20px;color:var(--suave)}
+  #avisos:not(:empty){margin-bottom:16px}
+  .aviso{background:#241a17;border:1px solid #4a2c24;border-left:6px solid var(--rojo);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .aviso .a-cab{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .aviso .a-tipo{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--rojo);font-weight:700}
+  .aviso .a-visto{background:none;border:1px solid var(--linea);color:var(--suave);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700}
+  .aviso .a-txt{font-size:13.5px;line-height:1.45;margin-top:6px}
+  .aviso .a-de{font-size:11px;color:var(--suave);margin-top:5px;font-family:'Space Mono',monospace}
+  .pie{margin-top:26px;font-family:'Space Mono',monospace;font-size:10px;color:var(--suave);letter-spacing:1px;text-align:center}
+  @media(prefers-reduced-motion:no-preference){.app{transition:transform .08s}.app:active{transform:scale(.985)}}
+</style>
+</head>
+<body>
+<div class="centro">
+  <h1>Vivace<small>Portal de cocina · Grupo Vivace</small></h1>
+
+  <section id="login">
+    <label for="usuario">Usuario</label>
+    <input id="usuario" autocomplete="username" autocapitalize="none">
+    <label for="pass">Contraseña</label>
+    <input id="pass" type="password" autocomplete="current-password">
+    <button id="btn-entrar">Entrar</button>
+    <div id="login-error"></div>
+  </section>
+
+  <section id="hub">
+    <div class="saludo">
+      <div class="quien">Sesión de <b id="quien"></b></div>
+      <button id="salir">Cerrar sesión</button>
+    </div>
+    <div id="avisos"></div>
+    <a class="app stock" href="/Economato/">
+      <div class="icono">📦</div>
+      <div class="t"><b>Economato</b><span>Inventario de género, niveles y pedido a proveedores</span></div>
+      <div class="ir">→</div>
+    </a>
+    <a class="app mise" href="/Mise-en-Place/">
+      <div class="icono">🥣</div>
+      <div class="t"><b>Mise en Place</b><span>Preparativos: qué producir, fichas del Manual 2 y registro de tandas</span></div>
+      <div class="ir">→</div>
+    </a>
+    <a class="app recep" href="/Recepcion-Genero/">
+      <div class="icono">📥</div>
+      <div class="t"><b>Recepción de género</b><span>Registra lo que llega, genera la factura y detecta cambios de precio</span></div>
+      <div class="ir">→</div>
+    </a>
+    <a class="app masa" href="/Produccion-Masa/">
+      <div class="icono">🍞</div>
+      <div class="t"><b>Producción de Masa</b><span>Amasado, boleado y cierre del día: balance de panetti a 5 días</span></div>
+      <div class="ir">→</div>
+    </a>
+    <a class="app recuento" href="/Recuento/">
+      <div class="icono">📋</div>
+      <div class="t"><b>Recuento de inventario</b><span>El conteo del lunes: valora la cámara y alimenta la desviación semanal</span></div>
+      <div class="ir">→</div>
+    </a>
+    <a class="app calendario" href="https://vivacegroup.github.io/Calendario-Demanda/vivace_demand_calendar.html" target="_blank" rel="noopener">
+      <div class="icono">📅</div>
+      <div class="t"><b>Calendario de Demanda</b><span>Escenario de la semana y kg de harina por día (Manual 1 §5.3)</span></div>
+      <div class="ir">↗</div>
+    </a>
+    <div class="pie">SISTEMA OPERATIVO MAESTRO · MANUALES 1–4</div>
+  </section>
+</div>
+
+<script>
+// ⚠ CONFIGURAR: misma URL /exec del Apps Script del Director (Portal.gs enruta todo)
+const API = 'https://script.google.com/macros/s/AKfycbxR12l4LsPLVBLGYIp70JNP4rX9q2UyFKaEpzoVuLTGHwByYNgbauk051r6BAFKOsN7Wg/exec';
+const CLAVE = 'vivace_sesion';
+
+function jsonp(params){
+  return new Promise((res, rej) => {
+    const cb = 'cb' + Math.random().toString(36).slice(2);
+    const s = document.createElement('script');
+    /* Sin este timeout, si el script nunca carga la promesa no se resuelve
+       jamás y el login se queda en "Comprobando…" para siempre. */
+    const t = setTimeout(() => { delete window[cb]; s.remove();
+                                 rej(new Error('El servidor no responde')); }, 25000);
+    window[cb] = d => { clearTimeout(t); delete window[cb]; s.remove(); res(d); };
+    const q = Object.entries(params).map(([k,v]) => k+'='+encodeURIComponent(v===undefined?'':v)).join('&');
+    s.src = API + '?' + q + '&callback=' + cb;
+    s.onerror = () => { clearTimeout(t); delete window[cb]; s.remove(); rej(new Error('Sin conexión')); };
+    document.body.appendChild(s);
+  });
+}
+
+function sesion(){
+  try{
+    const s = JSON.parse(localStorage.getItem(CLAVE) || 'null');
+    if (s && s.token && Date.now() - s.creada < 14*3600*1000) return s;
+  }catch(e){}
+  return null;
+}
+
+function pintar(){
+  const s = sesion();
+  document.getElementById('login').style.display = s ? 'none' : 'block';
+  document.getElementById('hub').style.display = s ? 'block' : 'none';
+  if (s){ document.getElementById('quien').textContent = s.nombre + ' · ' + s.rol; cargarAvisos(); }
+}
+
+async function cargarAvisos(){
+  const s = sesion(); if(!s) return;
+  try{
+    const r = await jsonp({action:'avisos', token:s.token});
+    if(!r.ok){ if(r.error==='SESION'){ localStorage.removeItem(CLAVE); pintar(); } return; }
+    pintarAvisos(r.avisos || [], s);
+  }catch(e){}
+}
+
+/* Los avisos traen texto de la hoja (nombres de producto, motivos escritos por
+   el equipo). Sin escapar, un nombre con < o " rompe el aviso y el resto de la
+   lista deja de pintarse. */
+function esc(t){
+  return String(t == null ? '' : t)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function pintarAvisos(avisos, s){
+  const cont = document.getElementById('avisos'); cont.innerHTML = '';
+  avisos.forEach(a => {
+    const el = document.createElement('div'); el.className = 'aviso';
+    const ajeno = s.rol === 'jefe' && String(a.usuario||'').toLowerCase() !== String(s.usuario||'').toLowerCase();
+    el.innerHTML = `<div class="a-cab"><span class="a-tipo">⚠ ${esc(a.tipo)} · ${esc(a.fecha)}</span>
+      <button class="a-visto">Visto ✓</button></div>
+      <div class="a-txt">${esc(a.detalle)}</div>` +
+      (ajeno ? `<div class="a-de">empleado: ${esc(a.usuario)}</div>` : '');
+    el.querySelector('.a-visto').onclick = async () => {
+      el.remove();
+      try{ await jsonp({action:'aviso_visto', token:s.token, fila:a.fila}); }catch(e){}
+    };
+    cont.appendChild(el);
+  });
+}
+
+document.getElementById('btn-entrar').onclick = async function(){
+  const err = document.getElementById('login-error');
+  if (this.disabled) return;
+  this.disabled = true;
+  err.textContent = 'Comprobando…';
+  try{
+    const r = await jsonp({
+      action: 'login',
+      usuario: document.getElementById('usuario').value,
+      pass: document.getElementById('pass').value
+    });
+    if (!r.ok) { err.textContent = r.error || 'No se pudo entrar'; return; }
+    localStorage.setItem(CLAVE, JSON.stringify({
+      token: r.token, usuario: r.usuario, nombre: r.nombre, rol: r.rol, creada: Date.now()
+    }));
+    err.textContent = '';
+    pintar();
+    if (r.avisos && r.avisos.length) pintarAvisos(r.avisos, sesion());
+  }catch(e){ err.textContent = e.message || 'Sin conexión — inténtalo de nuevo'; }
+  finally{ this.disabled = false; }
+};
+document.getElementById('pass').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('btn-entrar').click(); });
+document.getElementById('salir').onclick = () => { localStorage.removeItem(CLAVE); pintar(); };
+pintar();
+</script>
+</body>
+</html>
