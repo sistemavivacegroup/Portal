@@ -45,6 +45,38 @@
   .aviso .a-de{font-size:11px;color:var(--suave);margin-top:5px;font-family:'Space Mono',monospace}
   .pie{margin-top:26px;font-family:'Space Mono',monospace;font-size:10px;color:var(--suave);letter-spacing:1px;text-align:center}
   @media(prefers-reduced-motion:no-preference){.app{transition:transform .08s}.app:active{transform:scale(.985)}}
+  .fuera{font-size:12px;color:var(--tinta);padding:9px 11px;background:var(--tarjeta);
+    border:1px solid var(--linea);border-radius:9px;margin-bottom:11px;line-height:1.5}
+  .turno-cab{background:var(--tarjeta);border:1px solid var(--linea);border-radius:11px;
+    padding:12px 14px;margin-bottom:10px}
+  .turno-cab b{display:block;font-size:14px}
+  .turno-cab span{display:block;font-size:11.5px;color:var(--tinta);margin-top:2px}
+  .prog{height:4px;background:var(--linea);border-radius:2px;margin-top:9px;overflow:hidden}
+  .prog i{display:block;height:100%;background:var(--ok,#58c281);transition:width .3s}
+  .pend{background:rgba(255,176,32,.08);border-left:3px solid var(--aviso,#ffb020);
+    border-radius:0 9px 9px 0;padding:10px 12px;margin-bottom:11px;font-size:12.5px}
+  .pend b{color:var(--aviso,#ffb020)}
+  .pend ul{margin:6px 0 0;padding-left:16px}
+  .pend li{margin-bottom:3px;line-height:1.45}
+  .pend em{display:block;font-style:normal;font-size:10.5px;color:var(--tinta);opacity:.8}
+  .grupo-t{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--tinta);
+    margin:13px 0 5px;font-weight:700}
+  ul.tareas{list-style:none;padding:0;margin:0}
+  ul.tareas li{display:flex;gap:11px;align-items:flex-start;background:var(--tarjeta);
+    border:1px solid var(--linea);border-radius:9px;padding:10px 12px;margin-bottom:6px}
+  ul.tareas li.ok{opacity:.5}
+  ul.tareas li.ok b{text-decoration:line-through}
+  .chk{flex:0 0 auto;width:22px;height:22px;border:1.5px solid var(--linea);border-radius:6px;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;
+    color:var(--ok,#58c281);font-weight:700}
+  li.ok .chk{border-color:var(--ok,#58c281);background:rgba(88,194,129,.12)}
+  ul.tareas b{font-size:13.5px;display:block}
+  ul.tareas span{font-size:11.5px;color:var(--tinta);display:block;margin-top:2px;line-height:1.45}
+  ul.tareas a{font-size:11.5px;color:var(--baja,#7aa7d9);display:inline-block;margin-top:5px}
+  .opt{font-style:normal;font-size:10px;color:var(--tinta);opacity:.7}
+  .btn-cerrar{width:100%;background:transparent;border:1px solid var(--linea);color:var(--papel);
+    border-radius:10px;padding:12px;font-size:13px;font-weight:700;font-family:inherit;
+    cursor:pointer;margin-top:14px;text-transform:uppercase;letter-spacing:.4px}
 </style>
 </head>
 <body>
@@ -66,6 +98,7 @@
       <button id="salir">Cerrar sesión</button>
     </div>
     <div id="avisos"></div>
+    <div id="turno"></div>
     <a class="app stock" href="/Economato/">
       <div class="icono">📦</div>
       <div class="t"><b>Economato</b><span>Inventario de género, niveles y pedido a proveedores</span></div>
@@ -128,7 +161,11 @@ function pintar(){
   const s = sesion();
   document.getElementById('login').style.display = s ? 'none' : 'block';
   document.getElementById('hub').style.display = s ? 'block' : 'none';
-  if (s){ document.getElementById('quien').textContent = s.nombre + ' · ' + s.rol; cargarAvisos(); }
+  if (s){
+    document.getElementById('quien').textContent = s.nombre + ' · ' + s.rol;
+    cargarAvisos();
+    cargarTurno();
+  }
 }
 
 async function cargarAvisos(){
@@ -148,6 +185,95 @@ function esc(t){
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
+/**
+ * Bloque de turno: lo que hay que hacer hoy.
+ *
+ * Solo aparece si el momento cae dentro del horario. Fuera de turno se muestra
+ * una línea discreta: enseñar la checklist de apertura a quien mira el portal
+ * desde el sofá un domingo es ruido, no ayuda.
+ */
+async function cargarTurno(){
+  const s = sesion(); if(!s) return;
+  try{
+    const r = await jsonp({ action:'rh_turno', token:s.token });
+    if(r && r.ok !== false) pintarTurno(r);
+  }catch(e){}
+}
+
+function pintarTurno(t){
+  const c = document.getElementById('turno');
+  if(!t){ c.innerHTML=''; return; }
+  if(!t.enTurno){
+    c.innerHTML = '<div class="fuera">' + esc(t.mensaje || 'Fuera de turno') + '</div>';
+    return;
+  }
+  const MOM = { apertura:'Antes de abrir', servicio:'Durante el servicio',
+                cierre:'Al cerrar', semanal:'Esta semana' };
+  const pend = t.pendientes || [];
+  let h = '';
+
+  // Lo que dejó el turno anterior va PRIMERO: es lo que se hereda sin resolver
+  // de un turno a otro precisamente porque nadie lo tiene delante.
+  if(pend.length){
+    h += '<div class="pend"><b>⚠ El turno anterior dejó ' + pend.length + ' cosa(s) sin hacer</b><ul>' +
+      pend.map(p => '<li>' + esc(p.titulo) +
+        '<em>' + esc(p.fecha) + (p.modulo ? ' · ' + esc(p.modulo) : '') + '</em></li>').join('') +
+      '</ul></div>';
+  }
+
+  const g = {};
+  (t.tareas||[]).forEach(x => { (g[x.momento] = g[x.momento] || []).push(x); });
+  const hechas = (t.tareas||[]).filter(x => x.hecha).length, total = (t.tareas||[]).length;
+
+  h += '<div class="turno-cab"><b>Tu turno · ' + esc(t.turno.entrada) + ' a ' + esc(t.turno.salida) + '</b>' +
+       '<span>' + esc(String(t.turno.funcion).replace('+',' y ')) + ' · ' + hechas + ' de ' + total + '</span>' +
+       '<div class="prog"><i style="width:' + (total ? Math.round(hechas/total*100) : 0) + '%"></i></div></div>';
+
+  ['apertura','servicio','cierre','semanal'].forEach(m => {
+    if(!g[m]) return;
+    h += '<div class="grupo-t">' + MOM[m] + '</div><ul class="tareas">';
+    g[m].forEach(x => {
+      h += '<li class="' + (x.hecha?'ok':'') + '" data-id="' + esc(x.id) + '">' +
+        '<span class="chk">' + (x.hecha?'✓':'') + '</span><div><b>' + esc(x.titulo) + '</b>' +
+        (x.obligatoria?'':' <em class="opt">opcional</em>') +
+        '<span>' + esc(x.detalle) + '</span>' +
+        (x.modulo ? '<a href="/' + esc(x.modulo) + '/">Ir a ' + esc(x.modulo) + ' →</a>' : '') +
+        '</div></li>';
+    });
+    h += '</ul>';
+  });
+  h += '<button class="btn-cerrar" id="b-cerrar-turno">Cerrar mi turno</button>';
+  c.innerHTML = h;
+
+  c.querySelectorAll('.tareas li:not(.ok) .chk').forEach(chk => {
+    chk.onclick = async () => {
+      const li = chk.parentNode;
+      li.classList.add('ok'); chk.textContent = '✓';
+      try{ await jsonp({ action:'rh_tarea', token:sesion().token, tarea:li.dataset.id, estado:'hecha' }); }
+      catch(e){ li.classList.remove('ok'); chk.textContent=''; }
+    };
+  });
+  document.getElementById('b-cerrar-turno').onclick = cerrarTurno;
+}
+
+async function cerrarTurno(){
+  const p = prompt('Escribe tu contraseña para cerrar el turno:');
+  if(!p) return;
+  try{
+    const r = await fetch(API, { method:'POST', redirect:'follow',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({ action:'rh_salida', token:sesion().token, password:p })
+    }).then(x => x.json());
+    if(!r.ok){ alert(r.error || 'No se pudo cerrar el turno'); return; }
+    let m = 'Turno cerrado';
+    if(r.fichaje) m += ': ' + r.fichaje.horas + ' h registradas';
+    if(r.aviso) m += '\n\n⚠ ' + r.aviso;
+    alert(m);
+    localStorage.removeItem(CLAVE);
+    pintar();
+  }catch(e){ alert('No se pudo cerrar: ' + e.message); }
+}
+
 function pintarAvisos(avisos, s){
   const cont = document.getElementById('avisos'); cont.innerHTML = '';
   avisos.forEach(a => {
