@@ -124,6 +124,10 @@
       <div class="t"><b>Recuento de inventario</b><span>El conteo del lunes: valora la cámara y alimenta la desviación semanal</span></div>
       <div class="ir">→</div>
     </a>
+      <a class="app admin" href="/Administracion/" id="app-admin" style="display:none">
+        <span class="ico">&#9881;</span>
+        <span class="txt"><b>Administración</b><em>Equipo, horarios y alertas</em></span>
+      </a>
 <div class="pie">SISTEMA OPERATIVO MAESTRO · MANUALES 1–4</div>
   </section>
 </div>
@@ -163,6 +167,12 @@ function pintar(){
   document.getElementById('hub').style.display = s ? 'block' : 'none';
   if (s){
     document.getElementById('quien').textContent = s.nombre + ' · ' + s.rol;
+    // Administración solo se ofrece al jefe. La comprobación real está en el
+    // backend; esto evita enseñar una puerta que no se puede abrir.
+    if(String(s.rol||'').toLowerCase() === 'jefe'){
+      const a = document.getElementById('app-admin');
+      if(a) a.style.display = '';
+    }
     cargarAvisos();
     cargarTurno();
   }
