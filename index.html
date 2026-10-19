@@ -25,24 +25,61 @@
   #login-error{color:var(--rojo);font-size:14px;font-weight:600;margin-top:14px;min-height:20px}
   /* Lanzador */
   #hub{display:none}
-  .saludo{display:flex;justify-content:space-between;align-items:center;margin:6px 0 22px}
-  .saludo .quien{font-size:14px;color:var(--suave)}
+  .barra{position:relative;z-index:55;margin:6px 0 22px}   /* por encima del fondo oscuro: la campana sigue visible con la bandeja abierta */
+  .saludo{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .saludo .quien{font-size:14px;color:var(--suave);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .saludo .quien b{color:var(--papel)}
-  .saludo button{background:none;border:1px solid var(--linea);color:var(--suave);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700}
+  .acciones{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+  #salir{background:none;border:1px solid var(--linea);color:var(--suave);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700;min-height:40px;cursor:pointer}
+  /* Bandeja de entrada: campana arriba a la derecha con el número de avisos sin leer */
+  .campana{position:relative;width:46px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--tarjeta);border:1px solid var(--linea);border-radius:10px;color:var(--suave);cursor:pointer}
+  .campana svg{width:21px;height:21px}
+  .campana.con{color:var(--papel);border-color:#6b5524}
+  .campana-n{position:absolute;top:-8px;right:-8px;min-width:21px;height:21px;padding:0 5px;border-radius:11px;background:var(--stock);color:#1a1405;font:700 11px/17px 'Space Mono',monospace;text-align:center;border:2px solid var(--fondo)}
+  .campana-n.urg{background:var(--rojo);color:#1a0805}
+  .campana-n[hidden]{display:none}
+  .bandeja{position:absolute;z-index:60;top:calc(100% + 8px);left:0;right:0;background:var(--tarjeta);border:1px solid var(--linea);border-radius:14px;box-shadow:0 18px 44px rgba(0,0,0,.65);display:flex;flex-direction:column;max-height:min(78vh,640px);overflow:hidden}
+  .bandeja[hidden]{display:none}
+  #bandeja-fondo{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.5)}
+  #bandeja-fondo[hidden]{display:none}
+  .b-cab{display:flex;justify-content:space-between;align-items:center;padding:6px 6px 0 16px}
+  .b-cab h2{font-family:'Archivo',sans-serif;font-stretch:125%;font-weight:900;font-size:15px;text-transform:uppercase;letter-spacing:.5px}
+  .b-x{background:none;border:none;color:var(--suave);font-size:22px;width:44px;height:44px;cursor:pointer}
+  .b-tabs{display:flex;padding:0 16px;border-bottom:1px solid var(--linea)}
+  .b-tab{background:none;border:none;border-bottom:3px solid transparent;color:var(--suave);font:700 13px 'Inter',sans-serif;padding:11px 2px;margin-right:18px;cursor:pointer;min-height:44px}
+  .b-tab[aria-selected=true]{color:var(--papel);border-bottom-color:var(--ok)}
+  .b-chips{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px 2px}
+  .b-chip{background:none;border:1px solid var(--linea);color:var(--suave);border-radius:999px;padding:6px 11px;font:600 12px 'Inter',sans-serif;cursor:pointer;min-height:32px}
+  .b-chip[aria-pressed=true]{background:var(--papel);color:#111;border-color:var(--papel)}
+  .b-chip i{font-style:normal;font-family:'Space Mono',monospace;margin-left:5px;opacity:.85}
+  .b-chip.urg:not([aria-pressed=true]){border-color:#6a3a30;color:#ff9a8a}
+  .b-lista{list-style:none;overflow-y:auto;padding:4px 12px 12px;flex:1 1 auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  .av{border:1px solid var(--linea);border-left:5px solid var(--stock);border-radius:11px;padding:11px 12px;margin-top:8px;background:#1f1f1f}
+  .av.urg{border-left-color:var(--rojo);background:#241a17}
+  .av.visto{opacity:.62;border-left-color:var(--linea)}
+  .av-cab{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .av-tipo{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.8px;text-transform:uppercase;font-weight:700}
+  .av-urg{font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;background:var(--rojo);color:#1a0805;border-radius:5px;padding:2px 6px}
+  .av-cab time{margin-left:auto;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--suave)}
+  .av-txt{font-size:13.5px;line-height:1.45;margin-top:7px;overflow-wrap:anywhere}
+  .av-pie{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:9px}
+  .av-de{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--suave)}
+  .av-ir{font-size:12px;color:var(--masa);font-weight:600}
+  .av-visto{margin-left:auto;background:none;border:1px solid var(--linea);color:var(--papel);border-radius:8px;padding:7px 12px;font:700 12px 'Inter',sans-serif;min-height:36px;cursor:pointer}
+  .b-vacio{padding:26px 10px;text-align:center;color:var(--suave);font-size:14px;line-height:1.5}
+  .b-vacio b{display:block;font-size:26px;color:var(--ok);margin-bottom:6px}
+  .b-pie{padding:10px 12px;border-top:1px solid var(--linea)}
+  .b-todas{width:100%;background:transparent;border:1px solid var(--linea);color:var(--papel);border-radius:10px;padding:12px;font:700 13px 'Inter',sans-serif;cursor:pointer;min-height:44px}
+  .b-msg{font-size:12px;color:var(--rojo);padding:8px 16px 0}
+  .campana:focus-visible,.b-x:focus-visible,.b-tab:focus-visible,.b-chip:focus-visible,.av-visto:focus-visible,.b-todas:focus-visible,#salir:focus-visible{outline:2px solid var(--ok);outline-offset:2px}
+  @media(prefers-reduced-motion:no-preference){.campana-n.urg{animation:late 2.4s ease-in-out infinite}@keyframes late{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}}
   .app{display:flex;align-items:center;gap:16px;background:var(--tarjeta);border:1px solid var(--linea);border-left:6px solid var(--linea);border-radius:14px;padding:18px 16px;margin-bottom:12px;text-decoration:none;color:var(--papel)}
-  .app.stock{border-left-color:var(--stock)} .app.mise{border-left-color:var(--mise)} .app.masa{border-left-color:var(--masa)} .app.recep{border-left-color:#c98bd9}
+  .app.stock{border-left-color:var(--stock)} .app.mise{border-left-color:var(--mise)} .app.masa{border-left-color:var(--masa)} .app.recep{border-left-color:#c98bd9} .app.recuento{border-left-color:#d9a07a} .app.admin{border-left-color:#8a8a82}
   .app .icono{font-size:26px;width:44px;text-align:center}
   .app .t{flex:1}
   .app .t b{display:block;font-family:'Archivo',sans-serif;font-stretch:125%;font-size:16px;letter-spacing:.3px}
   .app .t span{font-size:12.5px;color:var(--suave);line-height:1.35;display:block;margin-top:3px}
   .app .ir{font-size:20px;color:var(--suave)}
-  #avisos:not(:empty){margin-bottom:16px}
-  .aviso{background:#241a17;border:1px solid #4a2c24;border-left:6px solid var(--rojo);border-radius:12px;padding:12px 14px;margin-bottom:8px}
-  .aviso .a-cab{display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .aviso .a-tipo{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--rojo);font-weight:700}
-  .aviso .a-visto{background:none;border:1px solid var(--linea);color:var(--suave);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700}
-  .aviso .a-txt{font-size:13.5px;line-height:1.45;margin-top:6px}
-  .aviso .a-de{font-size:11px;color:var(--suave);margin-top:5px;font-family:'Space Mono',monospace}
   .pie{margin-top:26px;font-family:'Space Mono',monospace;font-size:10px;color:var(--suave);letter-spacing:1px;text-align:center}
   @media(prefers-reduced-motion:no-preference){.app{transition:transform .08s}.app:active{transform:scale(.985)}}
   .fuera{font-size:12px;color:var(--tinta);padding:9px 11px;background:var(--tarjeta);
@@ -93,11 +130,20 @@
   </section>
 
   <section id="hub">
-    <div class="saludo">
-      <div class="quien">Sesión de <b id="quien"></b></div>
-      <button id="salir">Cerrar sesión</button>
+    <div class="barra">
+      <div class="saludo">
+        <div class="quien">Sesión de <b id="quien"></b></div>
+        <div class="acciones">
+          <button id="btn-bandeja" class="campana" aria-haspopup="dialog" aria-expanded="false" aria-controls="bandeja" aria-label="Bandeja de entrada">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            <span id="campana-n" class="campana-n" hidden>0</span>
+          </button>
+          <button id="salir">Cerrar sesión</button>
+        </div>
+      </div>
+      <section id="bandeja" class="bandeja" role="dialog" aria-label="Bandeja de entrada" hidden></section>
     </div>
-    <div id="avisos"></div>
+    <div id="bandeja-fondo" hidden></div>
     <div id="turno"></div>
     <a class="app stock" href="/Economato/">
       <div class="icono">📦</div>
@@ -124,10 +170,11 @@
       <div class="t"><b>Recuento de inventario</b><span>El conteo del lunes: valora la cámara y alimenta la desviación semanal</span></div>
       <div class="ir">→</div>
     </a>
-      <a class="app admin" href="/Administracion/" id="app-admin" style="display:none">
-        <span class="ico">&#9881;</span>
-        <span class="txt"><b>Administración</b><em>Equipo, horarios y alertas</em></span>
-      </a>
+    <a class="app admin" href="/Administracion/" id="app-admin" style="display:none">
+      <div class="icono">⚙️</div>
+      <div class="t"><b>Administración</b><span>Equipo, horarios y alertas</span></div>
+      <div class="ir">→</div>
+    </a>
 <div class="pie">SISTEMA OPERATIVO MAESTRO · MANUALES 1–4</div>
   </section>
 </div>
@@ -173,20 +220,189 @@ function pintar(){
       const a = document.getElementById('app-admin');
       if(a) a.style.display = '';
     }
+    pintarCampana();
     cargarAvisos();
+    iniciarSondeo();
     cargarTurno();
+  } else {
+    clearInterval(B.timer); B.avisos = [];
+    document.getElementById('bandeja').hidden = true; document.getElementById('bandeja-fondo').hidden = true;
+    pintarCampana();
   }
+}
+
+/* ═══════════════ BANDEJA DE ENTRADA ═══════════════
+   Las alertas y mensajes del sistema ya no van sueltos en el menú: viven en la
+   campana de arriba a la derecha, con el número de avisos sin leer. Al pulsarla
+   se abre la bandeja: pestañas "Sin leer" / "Vistos" y un filtro por tipo. */
+const TIPOS = {
+  ingesta:{ico:'📊',txt:'Ventas',ruta:''},          datos:{ico:'🧩',txt:'Datos',ruta:''},
+  recuento:{ico:'📋',txt:'Recuento',ruta:'/Recuento/'},
+  masa:{ico:'🍞',txt:'Masa',ruta:'/Produccion-Masa/'},
+  recepcion:{ico:'📥',txt:'Recepción',ruta:'/Recepcion-Genero/'},
+  horario:{ico:'⏰',txt:'Horario',ruta:'/Administracion/',jefe:true},
+  tareas:{ico:'✅',txt:'Tareas',ruta:'/Administracion/',jefe:true},
+  tarea:{ico:'✅',txt:'Tareas',ruta:'/Administracion/',jefe:true},
+  apertura:{ico:'🔑',txt:'Apertura',ruta:''},
+  produccion:{ico:'🥣',txt:'Producción',ruta:'/Mise-en-Place/'},
+  precios:{ico:'💰',txt:'Precios',ruta:'/Economato/'},
+  economato:{ico:'📦',txt:'Economato',ruta:'/Economato/'},
+  informes:{ico:'📈',txt:'Informes',ruta:''},
+  sistema:{ico:'⚙️',txt:'Sistema',ruta:''}
+};
+const B = { avisos:[], pestana:'sin', filtro:'', timer:null, error:'' };
+
+function infoTipo(t){
+  const k = String(t||'').trim().toLowerCase();
+  return TIPOS[k] || { ico:'🔔', txt: k ? k.charAt(0).toUpperCase()+k.slice(1) : 'Aviso', ruta:'' };
+}
+const esUrgente = a => String(a.nivel||'').toLowerCase() === 'alta';
+const sinLeer = () => B.avisos.filter(a => !a.visto);
+const esJefe = s => String((s||{}).rol||'').trim().toLowerCase() === 'jefe';
+
+function porTipo(lista){
+  const m = new Map();
+  lista.forEach(a => {
+    const t = infoTipo(a.tipo), e = m.get(t.txt) || { n:0, urg:0, ico:t.ico };
+    e.n++; if(esUrgente(a)) e.urg++; m.set(t.txt, e);
+  });
+  return m;
+}
+function fechaCorta(a){
+  const L = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const hoy = new Date(), ayer = new Date(); ayer.setDate(hoy.getDate()-1);
+  const hora = a.hora ? ' ' + a.hora : '';
+  if(a.fecha === L(hoy))  return 'hoy' + hora;
+  if(a.fecha === L(ayer)) return 'ayer' + hora;
+  const p = String(a.fecha||'').split('-');
+  const MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return p.length === 3 ? parseInt(p[2],10) + ' ' + (MES[parseInt(p[1],10)-1]||'') + hora : String(a.fecha||'');
 }
 
 async function cargarAvisos(){
   const s = sesion(); if(!s) return;
   try{
-    const r = await jsonp({action:'avisos', token:s.token});
+    const r = await jsonp({action:'avisos', token:s.token, todos:1});
     if(!r.ok){ if(r.error==='SESION'){ localStorage.removeItem(CLAVE); pintar(); } return; }
-    pintarAvisos(r.avisos || [], s);
+    B.avisos = r.avisos || [];
+    pintarBandeja();
   }catch(e){}
 }
 
+/** La campana: número de avisos sin leer (rojo si alguno es urgente) y, al leerla con un lector de pantalla, el desglose por tipo. */
+function pintarCampana(){
+  const sin = sinLeer(), n = sin.length, urg = sin.some(esUrgente);
+  const num = document.getElementById('campana-n'), btn = document.getElementById('btn-bandeja');
+  num.hidden = !n; num.textContent = n > 9 ? '9+' : String(n); num.className = 'campana-n' + (urg ? ' urg' : '');
+  const det = [...porTipo(sin)].map(([t,e]) => t + ' ' + e.n).join(', ');
+  const txt = n ? 'Bandeja de entrada: ' + n + ' sin leer (' + det + ')' : 'Bandeja de entrada: sin avisos nuevos';
+  btn.setAttribute('aria-label', txt); btn.title = txt;
+  btn.classList.toggle('con', n > 0);
+  document.title = (n ? '(' + n + ') ' : '') + 'Vivace · Portal de Cocina';
+}
+
+function pintarBandeja(){
+  pintarCampana();
+  const p = document.getElementById('bandeja'); if(p.hidden) return;
+  const s = sesion(), sin = sinLeer(), vis = B.avisos.filter(a => a.visto);
+  const lista = B.pestana === 'sin' ? sin : vis;
+  const cuentas = porTipo(lista);
+  if(B.filtro && !cuentas.has(B.filtro)) B.filtro = '';
+  let mostrar = lista.filter(a => !B.filtro || infoTipo(a.tipo).txt === B.filtro);
+  if(B.pestana === 'sin') mostrar = mostrar.filter(esUrgente).concat(mostrar.filter(a => !esUrgente(a)));   // lo urgente primero
+
+  let h = '<div class="b-cab"><h2>Bandeja de entrada</h2><button class="b-x" data-acc="cerrar" aria-label="Cerrar la bandeja">✕</button></div>' +
+    '<div class="b-tabs" role="tablist">' +
+      '<button class="b-tab" role="tab" data-acc="pestana" data-v="sin" aria-selected="' + (B.pestana==='sin') + '">Sin leer (' + sin.length + ')</button>' +
+      '<button class="b-tab" role="tab" data-acc="pestana" data-v="vis" aria-selected="' + (B.pestana==='vis') + '">Vistos (' + vis.length + ')</button></div>';
+  if(cuentas.size > 1 || B.filtro){
+    h += '<div class="b-chips" aria-label="Filtrar por tipo"><button class="b-chip" data-acc="filtro" data-v="" aria-pressed="' + (!B.filtro) + '">Todas<i>' + lista.length + '</i></button>' +
+      [...cuentas].map(([t,e]) => '<button class="b-chip' + (e.urg ? ' urg' : '') + '" data-acc="filtro" data-v="' + esc(t) + '" aria-pressed="' + (B.filtro===t) + '">' + e.ico + ' ' + esc(t) + '<i>' + e.n + '</i></button>').join('') + '</div>';
+  }
+  if(B.error) h += '<div class="b-msg" role="alert">' + esc(B.error) + '</div>';
+  if(!mostrar.length){
+    h += '<ul class="b-lista"><li class="b-vacio">' + (B.pestana==='sin'
+      ? '<b>✓</b>Todo al día.<br>No tienes avisos sin leer.' : 'Aún no hay avisos vistos de los últimos 14 días.') + '</li></ul>';
+  } else {
+    h += '<ul class="b-lista">' + mostrar.map(a => {
+      const t = infoTipo(a.tipo), urg = esUrgente(a);
+      const ajeno = esJefe(s) && String(a.usuario||'').toLowerCase() !== String((s||{}).usuario||'').toLowerCase();
+      const ir = t.ruta && (!t.jefe || esJefe(s)) ? '<a class="av-ir" href="' + t.ruta + '">Abrir →</a>' : '';
+      return '<li class="av' + (urg ? ' urg' : '') + (a.visto ? ' visto' : '') + '">' +
+        '<div class="av-cab"><span class="av-tipo">' + t.ico + ' ' + esc(t.txt) + '</span>' + (urg && !a.visto ? '<span class="av-urg">Urgente</span>' : '') +
+        '<time>' + esc(fechaCorta(a)) + '</time></div>' +
+        '<div class="av-txt">' + esc(a.detalle) + '</div>' +
+        '<div class="av-pie">' + (ajeno ? '<span class="av-de">empleado: ' + esc(a.usuario) + '</span>' : '') + ir +
+        (a.visto ? '' : '<button class="av-visto" data-acc="visto" data-fila="' + esc(a.fila) + '">Visto ✓</button>') + '</div></li>';
+    }).join('') + '</ul>';
+  }
+  if(B.pestana === 'sin' && mostrar.length){
+    h += '<div class="b-pie"><button class="b-todas" data-acc="todas">' +
+      (B.filtro ? 'Marcar las de «' + esc(B.filtro) + '» como vistas (' + mostrar.length + ')' : 'Marcar todas como vistas (' + sin.length + ')') + '</button></div>';
+  }
+  const foco = document.activeElement && p.contains(document.activeElement) ? document.activeElement.getAttribute('data-acc') : '';
+  p.innerHTML = h;
+  if(foco === 'pestana' || foco === 'filtro'){ const b = p.querySelector('[data-acc="' + foco + '"][aria-selected="true"],[data-acc="' + foco + '"][aria-pressed="true"]'); if(b) b.focus(); }
+}
+
+function abrirBandeja(){
+  B.pestana = 'sin'; B.filtro = ''; B.error = '';
+  const p = document.getElementById('bandeja');
+  p.hidden = false; document.getElementById('bandeja-fondo').hidden = false;
+  document.getElementById('btn-bandeja').setAttribute('aria-expanded', 'true');
+  pintarBandeja();
+  const x = p.querySelector('.b-x'); if(x) x.focus();
+  cargarAvisos();                               // al abrir se refresca
+}
+function cerrarBandeja(){
+  const p = document.getElementById('bandeja'); if(p.hidden) return;
+  p.hidden = true; document.getElementById('bandeja-fondo').hidden = true;
+  const b = document.getElementById('btn-bandeja'); b.setAttribute('aria-expanded', 'false'); b.focus();
+}
+
+async function marcarVisto(fila){
+  const a = B.avisos.find(x => String(x.fila) === String(fila)); if(!a || a.visto) return;
+  a.visto = true; B.error = ''; pintarBandeja();
+  try{
+    const r = await jsonp({action:'aviso_visto', token:sesion().token, fila:a.fila});
+    if(!r || !r.ok) throw new Error('no marcado');
+  }catch(e){ a.visto = false; B.error = 'No se pudo marcar como visto. Revisa la conexión e inténtalo de nuevo.'; pintarBandeja(); }
+}
+async function marcarTodas(){
+  const s = sesion(); if(!s) return;
+  const filtro = B.filtro;   // pintarBandeja() lo borra cuando ya no quedan avisos de ese tipo
+  const objetivo = sinLeer().filter(a => !filtro || infoTipo(a.tipo).txt === filtro);
+  if(!objetivo.length) return;
+  objetivo.forEach(a => { a.visto = true; }); B.error = ''; pintarBandeja();
+  try{
+    if(!filtro){
+      const r = await jsonp({action:'avisos_todos_vistos', token:s.token});
+      if(!r || !r.ok) throw new Error('no marcado');
+    } else {
+      const rs = await Promise.all(objetivo.map(a => jsonp({action:'aviso_visto', token:s.token, fila:a.fila})));
+      if(rs.some(r => !r || !r.ok)) throw new Error('no marcado');
+    }
+  }catch(e){ B.error = 'No se pudieron marcar todos. Revisa la conexión.'; await cargarAvisos(); pintarBandeja(); }
+}
+
+document.getElementById('btn-bandeja').onclick = () => { document.getElementById('bandeja').hidden ? abrirBandeja() : cerrarBandeja(); };
+document.getElementById('bandeja-fondo').onclick = cerrarBandeja;
+document.addEventListener('keydown', e => { if(e.key === 'Escape') cerrarBandeja(); });
+document.getElementById('bandeja').addEventListener('click', e => {
+  const el = e.target.closest('[data-acc]'); if(!el) return;
+  const acc = el.getAttribute('data-acc');
+  if(acc === 'cerrar') cerrarBandeja();
+  else if(acc === 'pestana'){ B.pestana = el.getAttribute('data-v'); B.filtro = ''; pintarBandeja(); }
+  else if(acc === 'filtro'){ B.filtro = el.getAttribute('data-v'); pintarBandeja(); }
+  else if(acc === 'visto') marcarVisto(el.getAttribute('data-fila'));
+  else if(acc === 'todas') marcarTodas();
+});
+/* Las alertas llegan a lo largo del día: la campana se refresca sola cada 2 minutos y al volver a la pestaña. */
+function iniciarSondeo(){
+  clearInterval(B.timer);
+  B.timer = setInterval(() => { if(!document.hidden && sesion()) cargarAvisos(); }, 120000);
+}
+document.addEventListener('visibilitychange', () => { if(!document.hidden && sesion()) cargarAvisos(); });
 /* Los avisos traen texto de la hoja (nombres de producto, motivos escritos por
    el equipo). Sin escapar, un nombre con < o " rompe el aviso y el resto de la
    lista deja de pintarse. */
@@ -284,23 +500,6 @@ async function cerrarTurno(){
   }catch(e){ alert('No se pudo cerrar: ' + e.message); }
 }
 
-function pintarAvisos(avisos, s){
-  const cont = document.getElementById('avisos'); cont.innerHTML = '';
-  avisos.forEach(a => {
-    const el = document.createElement('div'); el.className = 'aviso';
-    const ajeno = s.rol === 'jefe' && String(a.usuario||'').toLowerCase() !== String(s.usuario||'').toLowerCase();
-    el.innerHTML = `<div class="a-cab"><span class="a-tipo">⚠ ${esc(a.tipo)} · ${esc(a.fecha)}</span>
-      <button class="a-visto">Visto ✓</button></div>
-      <div class="a-txt">${esc(a.detalle)}</div>` +
-      (ajeno ? `<div class="a-de">empleado: ${esc(a.usuario)}</div>` : '');
-    el.querySelector('.a-visto').onclick = async () => {
-      el.remove();
-      try{ await jsonp({action:'aviso_visto', token:s.token, fila:a.fila}); }catch(e){}
-    };
-    cont.appendChild(el);
-  });
-}
-
 document.getElementById('btn-entrar').onclick = async function(){
   const err = document.getElementById('login-error');
   if (this.disabled) return;
@@ -317,8 +516,8 @@ document.getElementById('btn-entrar').onclick = async function(){
       token: r.token, usuario: r.usuario, nombre: r.nombre, rol: r.rol, creada: Date.now()
     }));
     err.textContent = '';
+    B.avisos = (r.avisos || []).map(a => Object.assign({}, a, { visto:false }));   // lo sin leer, al instante
     pintar();
-    if (r.avisos && r.avisos.length) pintarAvisos(r.avisos, sesion());
   }catch(e){ err.textContent = e.message || 'Sin conexión — inténtalo de nuevo'; }
   finally{ this.disabled = false; }
 };
